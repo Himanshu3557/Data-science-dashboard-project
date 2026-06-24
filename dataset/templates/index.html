@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Health Analytics Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    </head>
+<body>
+
+<div class="container">
+
+<header>
+    <h1>❤️ Heart Health Analytics Dashboard</h1>
+    <p class="subtitle">Data-driven insights for cardiovascular risk assessment</p>
+</header>
+
+<div class="main-wrapper">
+
+<aside class="sidebar">
+<form method="GET" action="/">
+
+<div class="filter-group">
+    <label>Gender</label>
+    <select name="gender">
+        <option value="">All</option>
+        {% for gender in genders %}
+        <option value="{{ gender }}" {% if filters.gender == gender %}selected{% endif %}>
+            {{ gender }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="filter-group">
+    <label>Age Range</label>
+
+    <div class="range-display">
+        <div>
+            <span class="range-label">Min</span>
+            <span class="range-value" id="age-min-value">
+                {{ filters.age_min or 18 }}
+            </span>
+        </div>
+
+        <div>
+            <span class="range-label">Max</span>
+            <span class="range-value" id="age-max-value">
+                {{ filters.age_max or 90 }}
+            </span>
+        </div>
+    </div>
+
+    <input type="range"
+           name="age_min"
+           id="age-min-slider"
+           min="18"
+           max="90"
+           value="{{ filters.age_min or 18 }}">
+
+    <input type="range"
+           name="age_max"
+           id="age-max-slider"
+           min="18"
+           max="90"
+           value="{{ filters.age_max or 90 }}">
+</div>
+
+<div class="filter-group">
+    <label>Smoking Status</label>
+    <select name="smoking_status">
+        <option value="">All</option>
+        {% for item in smoking_statuses %}
+        <option value="{{ item }}" {% if filters.smoking_status == item %}selected{% endif %}>
+            {{ item }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="filter-group">
+    <label>Clinical Diagnosis</label>
+    <select name="clinical_diagnosis">
+        <option value="">All</option>
+        {% for diagnosis in diagnoses %}
+        <option value="{{ diagnosis }}" {% if filters.clinical_diagnosis == diagnosis %}selected{% endif %}>
+            {{ diagnosis }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="filter-group">
+    <label>Cardiac Risk Level</label>
+    <select name="cardiac_risk_level">
+        <option value="">All</option>
+        {% for risk in risk_levels %}
+        <option value="{{ risk }}" {% if filters.cardiac_risk_level == risk %}selected{% endif %}>
+            {{ risk }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<button type="submit" class="btn-filter">
+    Apply Filters
+</button>
+
+<a href="/" class="btn-reset">
+    Reset
+</a>
+
+</form>
+</aside>
+
+<main class="main-content">
+
+<div class="data-overview-section">
+
+<h2>Dashboard Overview</h2>
+
+<div class="kpi-grid">
+
+<div class="kpi-card">
+    <div class="kpi-icon">👥</div>
+    <div class="kpi-value">{{ kpis.total_patients }}</div>
+    <div class="kpi-label">Total Patients</div>
+</div>
+
+<div class="kpi-card">
+    <div class="kpi-icon">🧓</div>
+    <div class="kpi-value">{{ kpis.avg_age }}</div>
+    <div class="kpi-label">Average Age</div>
+</div>
+
+<div class="kpi-card">
+    <div class="kpi-icon">📈</div>
+    <div class="kpi-value">{{ kpis.avg_bmi }}</div>
+    <div class="kpi-label">Average BMI</div>
+</div>
+
+<div class="kpi-card">
+    <div class="kpi-icon">🩺</div>
+    <div class="kpi-value">{{ kpis.avg_systolic_bp }}</div>
+    <div class="kpi-label">Avg Systolic BP</div>
+</div>
+
+<div class="kpi-card">
+    <div class="kpi-icon">🧪</div>
+    <div class="kpi-value">{{ kpis.avg_cholesterol }}</div>
+    <div class="kpi-label">Avg Cholesterol</div>
+</div>
+
+<div class="kpi-card">
+    <div class="kpi-icon">🍬</div>
+    <div class="kpi-value">{{ kpis.avg_blood_sugar }}</div>
+    <div class="kpi-label">Avg Blood Sugar</div>
+</div>
+
+</div>
+</div>
+
+<h2>Data Visualizations</h2>
+
+<div class="graph-grid">
+
+<div class="graph-card">
+    <img src="{{ url_for('static', filename='images/gender_distribution.png') }}" alt="Gender distribution">
+</div>
+
+<div class="graph-card">
+    <img src="{{ url_for('static', filename='images/cardiac_risk_distribution.png') }}" alt="Risk distribution">
+</div>
+
+<div class="graph-card">
+    <img src="{{ url_for('static', filename='images/bmi_distribution.png') }}" alt="BMI distribution">
+</div>
+
+<div class="graph-card">
+    <img src="{{ url_for('static', filename='images/systolic_bp.png') }}" alt="BP distribution">
+</div>
+
+<div class="graph-card">
+    <img src="{{ url_for('static', filename='images/chest_pain_type.png') }}" alt="Chest pain">
+</div>
+
+<div class="graph-card">
+    <img src="{{ url_for('static', filename='images/diagnosis_vs_risk.png') }}" alt="Diagnosis vs risk">
+</div>
+
+</div>
+
+<h2>Top 20 Patient Records</h2>
+
+<div class="table-container">
+
+<table class="records-table">
+
+<thead>
+<tr>
+    <th>Patient ID</th>
+    <th>Age</th>
+    <th>Gender</th>
+    <th>BMI</th>
+    <th>Systolic BP</th>
+    <th>Diastolic BP</th>
+    <th>Smoking</th>
+    <th>Diagnosis</th>
+    <th>Risk Level</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for record in top_records %}
+<tr>
+    <td>{{ record.Patient_ID }}</td>
+    <td>{{ record.Age }}</td>
+    <td>{{ record.Gender }}</td>
+    <td>{{ record.BMI }}</td>
+    <td>{{ record.Systolic_BP }}</td>
+    <td>{{ record.Diastolic_BP }}</td>
+    <td>{{ record.Smoking_Status }}</td>
+    <td>{{ record.Clinical_Diagnosis }}</td>
+    <td>{{ record.Cardiac_Risk_Level }}</td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+
+</main>
+</div>
+
+<footer>
+    <p>Heart Health Analytics Dashboard - Cardiac Patient Data Analytics Project</p>
+</footer>
+
+</div>
+
+<script>
+function updateRangeDisplay(minInputId,maxInputId,minLabelId,maxLabelId){
+    const minInput=document.getElementById(minInputId);
+    const maxInput=document.getElementById(maxInputId);
+    const minLabel=document.getElementById(minLabelId);
+    const maxLabel=document.getElementById(maxLabelId);
+
+    function update(){
+        minLabel.textContent=minInput.value;
+        maxLabel.textContent=maxInput.value;
+    }
+
+    minInput.addEventListener('input',update);
+    maxInput.addEventListener('input',update);
+    update();
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+    updateRangeDisplay(
+        'age-min-slider',
+        'age-max-slider',
+        'age-min-value',
+        'age-max-value'
+    );
+});
+</script>
+
+</body>
+</html>
